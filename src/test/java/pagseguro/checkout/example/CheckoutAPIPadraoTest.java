@@ -46,8 +46,8 @@ public class CheckoutAPIPadraoTest {
 
     private Map<String, String> getCheckoutParameters() {
         Map <String,String> checkout = new HashMap<>();
-        checkout.put("email","andvicente@gmail.com");
-        checkout.put("token","64C39C0B4A564BD6BC9B0DB661345912");
+        checkout.put("email","xxxxx@xxxxx.com");
+        checkout.put("token","xxxxxxxx");
         checkout.put("currency","BRL");
         checkout.put("itemId1","0001");
         checkout.put("itemDescription1","Produto PagSeguroI");
