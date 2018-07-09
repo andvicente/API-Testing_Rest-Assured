@@ -39,6 +39,7 @@ public class SpotifyTest {
 
         Response response =
         given().
+                auth().oauth2("").
                 accept(ContentType.JSON).
                 queryParam("q", "Coldplay").
                 queryParam("type", "artist").
@@ -64,6 +65,7 @@ public class SpotifyTest {
     public void shouldReturn10topTracksOfPinkFloyd(){
         Response response =
                 given().
+                        auth().oauth2("").
                         accept(ContentType.JSON).
                         queryParam("q", "Pink Floyd").
                         queryParam("type", "artist").
@@ -103,17 +105,13 @@ public class SpotifyTest {
     /**
      * Retorna Playlists de um Usuario do Spotify
      * URL API: https://api.spotify.com/v1/users/{user_id}/playlists
-     * Credenciais:
-     *      APP - spotify-univem
-     *      Client ID - 36960af1c9804ee6939a6bd385463f5b
-     *      Client Secret - 72b39f91a7cb437f9098256654156a8b
      */
     @Test
     public void shouldReturnPlaylistsOfUser(){
 
         Response responsePlaylistsOfUser =
                 given().
-                        auth().oauth2("BQAzqBOv7JD6y_7dJmwBXQEsElBWkdFalGTEBUYVD5XdYyEI_g6tLQkYrniDwk7SeIZd-iSjMtbz5P2lYsfsuQ").
+                        auth().oauth2("").
                         accept(ContentType.JSON).
                         pathParameter("user_id","andvicente").
                 when().
@@ -122,7 +120,7 @@ public class SpotifyTest {
                         //log().
                         //body().
                         statusCode(200).
-                        body("items.name",hasItem("2016 - by André")).
+                        body("items.name",hasItem("Wedding Rock and Classics")).
                 extract().
                         response();
 
