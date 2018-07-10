@@ -1,22 +1,20 @@
 package spotify.example;
 
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.Response;
-import org.junit.Before;
-import org.junit.Test;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import spotify.example.domain.Artista;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 
 /**
@@ -24,7 +22,29 @@ import static org.hamcrest.Matchers.hasSize;
  */
 public class SpotifyTest {
 
-    @Before
+    public static String accessToken = "";
+
+    @BeforeAll
+    public static void authenticationSpotify(){
+        String authToken = EncodeToken.getAuthToken("", "");
+        generateAccessToken(authToken);
+    }
+
+    private static void generateAccessToken(String authToken) {
+        RestAssured.baseURI = "https://accounts.spotify.com/api";
+
+        Response response = given().
+                header("Authorization","Basic "+authToken).
+                contentType("application/x-www-form-urlencoded").
+                formParam("grant_type","client_credentials").
+                log().all().
+                when().
+                post("token");
+
+        accessToken = response.jsonPath().get("access_token");
+    }
+
+    @BeforeEach
     public void antesTestes(){
         RestAssured.baseURI = "https://api.spotify.com";
         RestAssured.basePath = "/v1/";
@@ -32,14 +52,14 @@ public class SpotifyTest {
 
     /**
      * Procurar por um artista no Spotify
-     * @throws Exception
-     */
+     *
+     * */
     @Test
-    public void shouldReturnColdPlay() throws Exception {
+    public void shouldReturnColdPlay() {
 
         Response response =
         given().
-                auth().oauth2("").
+                auth().oauth2(this.accessToken).
                 accept(ContentType.JSON).
                 queryParam("q", "Coldplay").
                 queryParam("type", "artist").
@@ -65,7 +85,7 @@ public class SpotifyTest {
     public void shouldReturn10topTracksOfPinkFloyd(){
         Response response =
                 given().
-                        auth().oauth2("").
+                        auth().oauth2(this.accessToken).
                         accept(ContentType.JSON).
                         queryParam("q", "Pink Floyd").
                         queryParam("type", "artist").
@@ -83,11 +103,11 @@ public class SpotifyTest {
 
         Response responseTopTracks =
                 given().
+                        auth().oauth2(this.accessToken).
                         accept(ContentType.JSON).
-                        pathParameter("id",idArtista).
                         queryParam("country","BR").
                 when().
-                        get("artists/{id}/top-tracks").
+                        get("artists/{id}/top-tracks",idArtista).
                 then().
                         //log().
                         //body().
@@ -111,14 +131,13 @@ public class SpotifyTest {
 
         Response responsePlaylistsOfUser =
                 given().
-                        auth().oauth2("").
+                        auth().oauth2(this.accessToken).
                         accept(ContentType.JSON).
-                        pathParameter("user_id","andvicente").
                 when().
-                        get("users/{user_id}/playlists").
+                        get("users/{user_id}/playlists","andvicente").
                 then().
-                        //log().
-                        //body().
+                        log().
+                        body().
                         statusCode(200).
                         body("items.name",hasItem("Wedding Rock and Classics")).
                 extract().

@@ -1,21 +1,21 @@
 package pagseguro.checkout.example;
 
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.ValidatableResponse;
-import org.junit.Before;
-import org.junit.Test;
+import io.restassured.RestAssured;
+import io.restassured.response.ValidatableResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 
 /**
  * Created by andvicente on 28/02/17.
  */
 public class CheckoutAPIPadraoTest {
 
-    @Before
+    @BeforeEach
     public void antesTestes(){
         RestAssured.baseURI = "https://ws.sandbox.pagseguro.uol.com.br";
         RestAssured.basePath = "/v2/";
@@ -28,7 +28,7 @@ public class CheckoutAPIPadraoTest {
         ValidatableResponse response =
                 given().
                         contentType("application/x-www-form-urlencoded").
-                        formParameters(checkout).
+                        formParams(checkout).
                 when().
                         post("checkout").
                 then().
@@ -37,10 +37,7 @@ public class CheckoutAPIPadraoTest {
                         statusCode(200);
 
         String checkoutCode = response.extract().body().xmlPath().getString("checkout.code");
-
-
-
-
+        System.out.println("URL Checkout: https://pagseguro.uol.com.br/v2/checkout/payment.html?code="+checkoutCode);
 
     }
 
